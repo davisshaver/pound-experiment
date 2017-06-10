@@ -1,7 +1,7 @@
 This project demonstrates prototype implementation of a POUND-like tracking technology.
 
 The following should happen:
-- When user visits with valid tracking URL – e.g. `/#.UNIQUE` – they are prompted to loogin.
-- Upon login, the system will fire an event with the `UNIQUE` value as well as a similar value for the current user, plus any other relevant referral or location information.
-- The system should show a tree that visualizes how they got to the site in reference to other users.
-- A new share link should be generated that allows the process to be repeated.
+- On visit, the app checks whether it is a known user. Currently with a cookie.
+- If not known, a new cookie is left. Either way, the unique user ID is recorded.
+- A hash is created based on an object containing the unique user ID, the page path, the time, and the value if any of the hash of URL that had brought the current user here. The object and its hash are recorded in a database for future processing.
+- The new hash replaces the original hash (if there was one) and process repeats from there.
