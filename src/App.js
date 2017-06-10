@@ -4,6 +4,29 @@ import './App.css';
 const sh = require('shorthash');
 const uuidV4 = require('uuid/v4');
 
+/**
+ * Use firebase database for now.
+ */
+const firebase = require('firebase');
+const config = {
+  apiKey: "AIzaSyCfaEEAbUzKHAtrm2ym7O9ov-bfeay19bY",
+  authDomain: "pound-f4f07.firebaseapp.com",
+  databaseURL: "https://pound-f4f07.firebaseio.com",
+  projectId: "pound-f4f07",
+  storageBucket: "pound-f4f07.appspot.com",
+  messagingSenderId: "825939539499"
+};
+firebase.initializeApp(config);
+const database = firebase.database();
+
+/**
+ * Basic function to write visit data.
+ * @param {object} visit 
+ */
+function writeVisitData(visit) {
+  database.ref(`visits/${visit.u}/${visit.t}`).set(visit);
+}
+
 class App extends Component {
   constructor() {
     super();
@@ -29,7 +52,7 @@ class App extends Component {
     /**
      * Construct an object representing this visit.
      */
-    const user = {
+    const visit = {
       u: userID,
       rU:(
         window.location.hash &&
@@ -49,8 +72,10 @@ class App extends Component {
      * We are hashing the string of the user object.
      * Generate new hash for forward tracking.
      */
-    const key = window.location.hash = `.${sh.unique(JSON.stringify(user))}`;
-    console.info(user, key);
+    visit.hash = sh.unique(JSON.stringify(visit));
+    window.location.hash = `.${visit.hash}`;
+    writeVisitData(visit)
+    console.log(visit);
   }
 
   render() {
