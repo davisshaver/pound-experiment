@@ -65,17 +65,86 @@ class App extends Component {
     };
 
     /**
-     * Record object to database.
-     */
-
-    /**
      * We are hashing the string of the user object.
      * Generate new hash for forward tracking.
      */
     visit.hash = sh.unique(JSON.stringify(visit));
-    window.location.hash = `.${visit.hash}`;
+
+    /**
+     * Record object to database.
+     */
     writeVisitData(visit)
-    console.log(visit);
+
+    /**
+     * Set the new hash.
+     */
+    window.location.hash = `.${visit.hash}`;
+
+    /**
+     * Load previous data.
+     * This is a little dense, but process is:
+     * - Get the db result (only once so it's immutable for now)
+     * - Pull the value out of the result
+     * - Start a reduce based on each visitor key
+     *  - For each visitor key, create a node first.
+     */
+    database.ref('visits/').once('value')
+      .then((result) => {
+        return result.val();
+      })
+      .then((data) => {
+        const userMap = Object.keys(data)
+          .reduce((agg, visitorKey) => {
+            agg[visitorKey] = Object.keys(data[visitorKey])
+              .map((viewKey) => {
+                return data[visitorKey][viewKey].hash
+              });
+            return agg;
+          }, {});
+        const transformed = Object.keys(data)
+          .reduce((agg, visitorKey) => {
+            /**
+             * For each unique title, get a node. Nested reduce not idea but oh well.
+             */
+            const uniqueTitles = [...new Set(
+              Object.keys(data[visitorKey]).map(visit => data[visitorKey][visit].p)
+            )];
+            uniqueTitles.reduce((agg, title) => {
+              const viewKeys = Object.keys(data[visitorKey]);
+              const viewsToTitle = viewKeys.map((key) => {
+                if (title === data[visitorKey][key].p) {
+                  return data[visitorKey][key];
+                }
+                return null;
+              });
+              const firstView = viewsToTitle.reduce(
+                (first, view) => (
+                  (!first && title === view.p) ? view : first
+                ), null
+              );
+              let referringUser = false;
+              Object.keys(userMap).forEach((user) => {
+                console.log(Object.values(userMap[user]));
+                if (Object.values(userMap[user]).includes(firstView.rU)) {
+                  referringUser = user;
+                }
+              });
+              agg.nodes.push({
+                user: visitorKey,
+                source: firstView.s,
+                referringUser,
+                viewsToTitle: viewsToTitle.length,
+                hashes: Object.values(viewsToTitle).map((view) => view.hash)
+              });
+              return agg;
+            }, agg);
+          return agg;
+        }, {nodes: [], segments: []});
+        console.log(transformed);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
 
   render() {
