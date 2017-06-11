@@ -129,7 +129,7 @@ class App extends Component {
                   referringUser = user;
                 }
               });
-              if (!referringUser) {
+              if (!referringUser && !agg.nodes.find((node) => title === node.id)) {
                 agg.nodes.push({
                   label: title,
                   id: title,
