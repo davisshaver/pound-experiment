@@ -45,6 +45,13 @@ class App extends Component {
 
 
     /**
+     * Set a bypass var for admin.
+     */
+    let bypass = false;
+    if ('#.bypass' === window.location.hash || 'dev' !== process.env.NODE_ENV) {
+      bypass = true;
+    }
+    /**
      * This portion would be hoisted to a 
      * service a later date so that alll the
      * user sees is the hash output.
@@ -74,7 +81,13 @@ class App extends Component {
     /**
      * Record object to database.
      */
-    writeVisitData(visit)
+    console.log(bypass);
+    if (!bypass) {
+      writeVisitData(visit)
+    } else {
+      console.log(visit);
+    }
+    
 
     /**
      * Set the new hash.
