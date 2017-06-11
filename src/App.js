@@ -203,6 +203,7 @@ class App extends Component {
     return (
       <div className="App">
         <h2>Welcome to Pound Demo</h2>
+        <strong><a href="https://davisshaver.com/2017/06/11/weekend-hack-pound-like-tracking-strings/">Read more</a></strong>
         <div id="viz"></div>
       </div>
     );
