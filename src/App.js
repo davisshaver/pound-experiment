@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Cookies from 'universal-cookie';
 import './App.css';
+const vis = require('vis');
 const sh = require('shorthash');
 const uuidV4 = require('uuid/v4');
 
@@ -101,7 +102,7 @@ class App extends Component {
               });
             return agg;
           }, {});
-        const transformed = Object.keys(data)
+        return Object.keys(data)
           .reduce((agg, visitorKey) => {
             /**
              * For each unique title, get a node. Nested reduce not idea but oh well.
@@ -124,23 +125,74 @@ class App extends Component {
               );
               let referringUser = false;
               Object.keys(userMap).forEach((user) => {
-                console.log(Object.values(userMap[user]));
                 if (Object.values(userMap[user]).includes(firstView.rU)) {
                   referringUser = user;
                 }
               });
+              if (!referringUser) {
+                agg.nodes.push({
+                  label: title,
+                  id: title,
+                  group: 'post',
+                });
+              }
+              const source = (firstView.s && !firstView.s.includes(window.location.hostname)) ? firstView.s.split( '/' )[2] : 'direct';
               agg.nodes.push({
-                user: visitorKey,
-                source: firstView.s,
+                title,
+                id: visitorKey,
+                label: visitorKey,
+                group: source,
                 referringUser,
-                viewsToTitle: viewsToTitle.length,
+                value: viewsToTitle.length,
                 hashes: Object.values(viewsToTitle).map((view) => view.hash)
               });
+              if (referringUser) {
+                agg.edges.push(
+                  {
+                    from: referringUser,
+                    to: visitorKey,
+                    label: `${viewsToTitle.length} views via ${source}`,
+                  },
+                );
+              } else {
+                agg.edges.push(
+                  {
+                    from: title,
+                    to: visitorKey,
+                    dashes: true,
+                    label: `${viewsToTitle.length} views via ${source}`,
+                  },
+                );
+              }
               return agg;
             }, agg);
           return agg;
-        }, {nodes: [], segments: []});
+        }, {nodes: [], edges: []});
+      })
+      .then((transformed) => {
         console.log(transformed);
+        const options = {
+          layout: {
+              hierarchical: {
+                  direction: 'UD',
+                  sortMethod: 'directed',
+                  levelSeparation: 300,
+                  nodeSpacing: 300,
+              }
+          },
+          physics: false,
+          groups: {
+              post: {
+                  shape: 'triangle',
+                  color: '#FF9900' // orange
+              },
+              direct: {
+                  shape: 'dot',
+                  color: "#2B7CE9" // blue
+              }
+          }
+        };
+        const network = new vis.Network(document.getElementById('viz'), transformed, options);
       })
       .catch((e) => {
         console.log(e);
@@ -151,6 +203,7 @@ class App extends Component {
     return (
       <div className="App">
         <h2>Welcome to Pound Demo</h2>
+        <div id="viz"></div>
       </div>
     );
   }
