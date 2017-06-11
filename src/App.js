@@ -48,7 +48,7 @@ class App extends Component {
      * Set a bypass var for admin.
      */
     let bypass = false;
-    if ('#.bypass' === window.location.hash || 'dev' !== process.env.NODE_ENV) {
+    if ('#.bypass' === window.location.hash) {
       bypass = true;
     }
     /**
