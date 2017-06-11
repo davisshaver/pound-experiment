@@ -81,7 +81,6 @@ class App extends Component {
     /**
      * Record object to database.
      */
-    console.log(bypass);
     if (!bypass) {
       writeVisitData(visit)
     } else {
