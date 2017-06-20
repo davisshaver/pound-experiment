@@ -47,6 +47,7 @@ class App extends Component {
         excludeTouchSupport: true,
       }).get((result) => {
         const perf = new Date() - start;
+        cookies.set('poundUser', result, { path: '/' });
         recordPageviewForUser({
           uidSource: 'fingerprint2',
           uid: result,
