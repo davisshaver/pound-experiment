@@ -1,6 +1,6 @@
 const sh = require('shorthash');
 
-export default function recordPageViewForUser({ uidSource, uid, uidTime }, database) {
+export default function recordPageViewForUser({ uidSource, uid, uidTime = 0}, database) {
 
     /**
      * Set a bypass var for admin.
