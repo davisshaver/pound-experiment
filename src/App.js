@@ -26,7 +26,7 @@ class App extends Component {
      * First fingerprint the browser.
      */
     const cookies = new Cookies();
-    let userID = cookies.get('pounddasfdUser');
+    let userID = cookies.get('poundUser');
     if (!userID) {
       const start = new Date();
       new Fingerprint2({
