@@ -38,8 +38,7 @@ export default function recordPageViewForUser({ uidSource, uid, uidTime }, datab
      * Record object to database.
      */
     if (!bypass) {
-      // database.ref(`visits/${visit.u}/${visit.t}`).set(visit);
-      console.log(visit);
+      database.ref(`visits/${visit.u}/${visit.t}`).set(visit);
     } else {
       console.log(visit);
     }
